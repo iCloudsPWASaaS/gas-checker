@@ -4,6 +4,7 @@ import {
   ArrowUpRight,
   Banknote,
   BellRing,
+  Briefcase,
   CalendarDays,
   Cloud,
   Contact,
@@ -11,9 +12,11 @@ import {
   FileText,
   Gauge,
   History,
+  MapPin,
   ReceiptText,
   Sparkles,
   TriangleAlert,
+  Wrench,
 } from "lucide-react";
 import { Badge, PageHeader, SectionTitle, StatCard, UpgradeNotice } from "@/components/ui";
 import { displayName, requireWebSession } from "@/lib/session";
@@ -28,9 +31,23 @@ const tiles = [
     tone: "bg-blue-50 text-blue-700",
   },
   {
-    href: "/dashboard/reminders",
-    label: "Notification",
-    description: "Overdue alerts",
+    href: "/dashboard/jobs",
+    label: "Jobs",
+    description: "Track every visit",
+    icon: Briefcase,
+    tone: "bg-indigo-50 text-indigo-700",
+  },
+  {
+    href: "/dashboard/properties",
+    label: "Job addresses",
+    description: "Properties you visit",
+    icon: MapPin,
+    tone: "bg-teal-50 text-teal-700",
+  },
+  {
+    href: "/dashboard/notifications",
+    label: "Notifications",
+    description: "Job updates & alerts",
     icon: BellRing,
     tone: "bg-amber-50 text-amber-700",
   },
@@ -82,6 +99,13 @@ const tiles = [
     description: "Metric & imperial",
     icon: Gauge,
     tone: "bg-emerald-50 text-emerald-700",
+  },
+  {
+    href: "/dashboard/tools",
+    label: "Tools & manuals",
+    description: "Pipe sizing & more",
+    icon: Wrench,
+    tone: "bg-cyan-50 text-cyan-700",
   },
 ];
 

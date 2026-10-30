@@ -36,6 +36,8 @@ export function SettingsForm({ settings }: { settings: Record<string, unknown> }
           phone: form.get("phone") || "",
           email: form.get("email") || "",
           gas_engineer_id: form.get("gas_engineer_id") || "",
+          oil_registration: form.get("oil_registration") || "",
+          mcs_registration: form.get("mcs_registration") || "",
           engineer_position: form.get("engineer_position") || "",
           engineer_signature_url: form.get("engineer_signature_url") || "",
           email_message: form.get("email_message") || "",
@@ -120,6 +122,14 @@ export function SettingsForm({ settings }: { settings: Record<string, unknown> }
           <div>
             <label className="label">Gas engineer ID</label>
             <input name="gas_engineer_id" className="input" defaultValue={value("gas_engineer_id")} placeholder="Gas Safe ID" />
+          </div>
+          <div>
+            <label className="label">Oil registration</label>
+            <input name="oil_registration" className="input" defaultValue={value("oil_registration")} placeholder="OFTEC registration" />
+          </div>
+          <div>
+            <label className="label">MCS installer reference</label>
+            <input name="mcs_registration" className="input" defaultValue={value("mcs_registration")} placeholder="MCS or equivalent" />
           </div>
           <div>
             <label className="label">Engineer position</label>

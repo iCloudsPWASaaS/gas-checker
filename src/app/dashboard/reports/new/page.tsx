@@ -8,7 +8,14 @@ import { REPORT_TYPES } from "@/lib/report-types";
 
 export const metadata: Metadata = { title: "Create report" };
 
-const categories = ["Domestic Certificate", "Commercial Certificate", "Continuation Pages", "General"] as const;
+const categories = [
+  "Domestic Certificate",
+  "Commercial Certificate",
+  "Heat Pump",
+  "Oil",
+  "Continuation Pages",
+  "General",
+] as const;
 
 export default async function NewReportPage({ searchParams }: { searchParams: Promise<{ type?: string }> }) {
   const session = await requireWebSession();

@@ -6,36 +6,43 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   ArrowUpRight,
   Banknote,
+  Bell,
+  BellRing,
+  Briefcase,
   CalendarDays,
   Cloud,
+  Code2,
   Contact,
+  CreditCard,
   FileBadge2,
   FileText,
-  Gauge,
   LayoutDashboard,
   LogOut,
+  MapPin,
   Menu,
   ReceiptText,
   Settings,
-  Sparkles,
-  X,
-  BellRing,
-  CreditCard,
-  Code2,
   ShieldCheck,
+  Sparkles,
+  Wrench,
+  X,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
+import { NotificationBell } from "@/components/notification-bell";
 import { cn } from "@/lib/utils";
 
 const nav = [
   { href: "/dashboard", label: "Home", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/schedule", label: "Schedule", icon: CalendarDays },
+  { href: "/dashboard/jobs", label: "Jobs", icon: Briefcase },
+  { href: "/dashboard/properties", label: "Job addresses", icon: MapPin },
   { href: "/dashboard/reports", label: "Certificates", icon: FileBadge2 },
   { href: "/dashboard/invoices", label: "Invoices", icon: ReceiptText },
   { href: "/dashboard/quotes", label: "Quotes", icon: FileText },
   { href: "/dashboard/contacts", label: "Contacts", icon: Contact },
   { href: "/dashboard/reminders", label: "Reminders", icon: BellRing },
-  { href: "/dashboard/gas-rate", label: "Gas rate", icon: Gauge },
+  { href: "/dashboard/tools", label: "Tools & manuals", icon: Wrench },
+  { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
   { href: "/dashboard/backup", label: "Backup / Restore", icon: Cloud },
 ];
 
@@ -92,9 +99,12 @@ export function DashboardShell({
     <div className="flex h-full flex-col">
       <div className="flex h-16 items-center justify-between px-5">
         <Logo href="/dashboard" />
-        <button className="lg:hidden" onClick={() => setOpen(false)} aria-label="Close menu">
-          <X className="h-5 w-5 text-slate-500" />
-        </button>
+        <div className="flex items-center gap-1">
+          <NotificationBell />
+          <button className="lg:hidden" onClick={() => setOpen(false)} aria-label="Close menu">
+            <X className="h-5 w-5 text-slate-500" />
+          </button>
+        </div>
       </div>
 
       <div className="px-3">
@@ -192,14 +202,17 @@ export function DashboardShell({
             <Menu className="h-5 w-5 text-slate-700" />
           </button>
           <Logo compact />
-          <span
-            className={cn(
-              "badge",
-              active ? "bg-brand-100 text-brand-800" : "bg-amber-100 text-amber-800",
-            )}
-          >
-            {isTrialing ? `${trialDaysLeft}d trial` : active ? "Active" : "Expired"}
-          </span>
+          <div className="flex items-center gap-1">
+            <NotificationBell />
+            <span
+              className={cn(
+                "badge",
+                active ? "bg-brand-100 text-brand-800" : "bg-amber-100 text-amber-800",
+              )}
+            >
+              {isTrialing ? `${trialDaysLeft}d trial` : active ? "Active" : "Expired"}
+            </span>
+          </div>
         </header>
 
         {isTrialing && (
@@ -247,8 +260,9 @@ export function SetupRequired({ message }: { message: string }) {
           </li>
           <li>
             2. Run{" "}
-            <code className="rounded bg-slate-100 px-1.5 py-0.5 text-xs">supabase/migrations/0001_init.sql</code> then{" "}
-            <code className="rounded bg-slate-100 px-1.5 py-0.5 text-xs">supabase/migrations/0002_admin.sql</code>.
+            <code className="rounded bg-slate-100 px-1.5 py-0.5 text-xs">supabase/migrations/0001_init.sql</code>,{" "}
+            <code className="rounded bg-slate-100 px-1.5 py-0.5 text-xs">0002_admin.sql</code> then{" "}
+            <code className="rounded bg-slate-100 px-1.5 py-0.5 text-xs">0003_jobs_tools_notifications.sql</code>.
           </li>
           <li>
             3. Go to <strong>Project Settings → API → Exposed schemas</strong> and add{" "}

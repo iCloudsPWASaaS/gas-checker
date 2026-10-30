@@ -12,6 +12,8 @@ export type BackupPayload = {
     profile?: Row | null;
     settings?: Row | null;
     contacts?: Row[];
+    properties?: Row[];
+    jobs?: Row[];
     documents?: Row[];
     document_items?: Row[];
     payments?: Row[];
@@ -19,6 +21,7 @@ export type BackupPayload = {
     reminders?: Row[];
     gas_reports?: Row[];
     gas_rate_calculations?: Row[];
+    notifications?: Row[];
   };
 };
 
@@ -27,6 +30,8 @@ export async function exportUserData(admin: AdminClient, userId: string): Promis
     profile,
     settings,
     contacts,
+    properties,
+    jobs,
     documents,
     documentItems,
     payments,
@@ -34,10 +39,13 @@ export async function exportUserData(admin: AdminClient, userId: string): Promis
     reminders,
     gasReports,
     gasRates,
+    notifications,
   ] = await Promise.all([
     admin.from("profiles").select("*").eq("id", userId).maybeSingle(),
     admin.from("settings").select("*").eq("user_id", userId).maybeSingle(),
     admin.from("contacts").select("*").eq("user_id", userId),
+    admin.from("properties").select("*").eq("user_id", userId),
+    admin.from("jobs").select("*").eq("user_id", userId),
     admin.from("documents").select("*").eq("user_id", userId),
     admin.from("document_items").select("*").eq("user_id", userId),
     admin.from("payments").select("*").eq("user_id", userId),
@@ -45,6 +53,7 @@ export async function exportUserData(admin: AdminClient, userId: string): Promis
     admin.from("reminders").select("*").eq("user_id", userId),
     admin.from("gas_reports").select("*").eq("user_id", userId),
     admin.from("gas_rate_calculations").select("*").eq("user_id", userId),
+    admin.from("notifications").select("*").eq("user_id", userId),
   ]);
 
   return {
@@ -55,6 +64,8 @@ export async function exportUserData(admin: AdminClient, userId: string): Promis
       profile: profile.data || null,
       settings: settings.data || null,
       contacts: contacts.data || [],
+      properties: properties.data || [],
+      jobs: jobs.data || [],
       documents: documents.data || [],
       document_items: documentItems.data || [],
       payments: payments.data || [],
@@ -62,6 +73,7 @@ export async function exportUserData(admin: AdminClient, userId: string): Promis
       reminders: reminders.data || [],
       gas_reports: gasReports.data || [],
       gas_rate_calculations: gasRates.data || [],
+      notifications: notifications.data || [],
     },
   };
 }
@@ -79,6 +91,8 @@ export async function restoreUserData(
   const data = backup.data;
   const counts = {
     contacts: 0,
+    properties: 0,
+    jobs: 0,
     documents: 0,
     document_items: 0,
     payments: 0,
@@ -86,10 +100,14 @@ export async function restoreUserData(
     reminders: 0,
     gas_reports: 0,
     gas_rate_calculations: 0,
+    notifications: 0,
   };
 
   if (mode === "replace") {
     await Promise.all([
+      admin.from("notifications").delete().eq("user_id", userId),
+      admin.from("jobs").delete().eq("user_id", userId),
+      admin.from("properties").delete().eq("user_id", userId),
       admin.from("payments").delete().eq("user_id", userId),
       admin.from("document_items").delete().eq("user_id", userId),
       admin.from("documents").delete().eq("user_id", userId),
@@ -112,6 +130,8 @@ export async function restoreUserData(
       phone: source.phone ?? null,
       email: source.email ?? null,
       gas_engineer_id: source.gas_engineer_id ?? null,
+      oil_registration: source.oil_registration ?? null,
+      mcs_registration: source.mcs_registration ?? null,
       engineer_position: source.engineer_position ?? null,
       email_message: source.email_message ?? null,
       email_cc: source.email_cc ?? null,
@@ -150,6 +170,46 @@ export async function restoreUserData(
     });
     if (error) throw error;
     counts.contacts += 1;
+  }
+
+  const propertyMap = new Map<string, string>();
+  for (const property of data.properties || []) {
+    const newId = randomUUID();
+    if (property.id) propertyMap.set(String(property.id), newId);
+    const { error } = await admin.from("properties").insert({
+      id: newId,
+      user_id: userId,
+      contact_id: contactMap.get(String(property.contact_id)) || null,
+      name: property.name || "Job address",
+      address_line1: property.address_line1 ?? null,
+      address_line2: property.address_line2 ?? null,
+      address_line3: property.address_line3 ?? null,
+      postcode: property.postcode ?? null,
+      access_notes: property.access_notes ?? null,
+      notes: property.notes ?? null,
+    });
+    if (error) throw error;
+    counts.properties += 1;
+  }
+
+  for (const job of data.jobs || []) {
+    const { error } = await admin.from("jobs").insert({
+      user_id: userId,
+      property_id: propertyMap.get(String(job.property_id)) || null,
+      contact_id: contactMap.get(String(job.contact_id)) || null,
+      reference: job.reference ?? null,
+      title: job.title || "Job",
+      job_type: job.job_type || "gas_safety",
+      status: job.status || "scheduled",
+      priority: job.priority || "normal",
+      scheduled_at: job.scheduled_at ?? null,
+      completed_at: job.completed_at ?? null,
+      engineer: job.engineer ?? null,
+      description: job.description ?? null,
+      notes: job.notes ?? null,
+    });
+    if (error) throw error;
+    counts.jobs += 1;
   }
 
   const { data: existingDocs } = await admin.from("documents").select("number").eq("user_id", userId);
@@ -323,6 +383,20 @@ export async function restoreUserData(
     });
     if (error) throw error;
     counts.gas_rate_calculations += 1;
+  }
+
+  for (const notification of data.notifications || []) {
+    const { error } = await admin.from("notifications").insert({
+      user_id: userId,
+      title: notification.title || "Notification",
+      body: notification.body ?? null,
+      kind: notification.kind || "system",
+      link: notification.link ?? null,
+      read_at: notification.read_at ?? null,
+      created_at: notification.created_at || new Date().toISOString(),
+    });
+    if (error) throw error;
+    counts.notifications += 1;
   }
 
   return counts;

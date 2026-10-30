@@ -11,9 +11,11 @@ Built with Next.js 15 (App Router), React 19, TypeScript, Tailwind CSS, Supabase
 - Email/password auth for the web (cookie session) and for mobile (Bearer access + refresh tokens)
 - Invoices and quotes with line items, 20% VAT support, statuses and partial payments
 - Convert a quote into a draft invoice in one request
-- Gas safety report records with appliances, defects and readings JSON
+- Gas safety report records with appliances, defects and readings JSON, including heat pump and oil records
+- Jobs and job addresses with statuses, priorities, scheduling and customer links
 - Schedule with repeat rules and alert offsets, plus pending/overdue reminders
-- Metric and imperial gas rate calculator with gross/net kW and saved history
+- Metric and imperial gas rate calculator, pipe sizing, installation volume and a boiler manual finder
+- Notification centre with unread counts and job update alerts
 - Contacts for clients, installations and suppliers
 - Full JSON export, download, cloud backup to Supabase Storage and merge/replace restore
 - Subscription gating: protected endpoints return `402 SUBSCRIPTION_REQUIRED` after the trial
@@ -60,9 +62,10 @@ Never expose the service role key to the browser or commit `.env.local`.
 
 1. Open the Supabase SQL editor and run `supabase/migrations/0001_init.sql`.
 2. Run `supabase/migrations/0002_admin.sql` next.
-3. In Supabase go to **Project Settings > API > Exposed schemas** and add `gas-checker`.
-4. Confirm **Storage** contains the private `gas-checker` bucket (created by the first migration).
-5. Optionally disable email confirmation, or keep `AUTH_AUTO_CONFIRM=true` for local development.
+3. Run `supabase/migrations/0003_jobs_tools_notifications.sql`.
+4. In Supabase go to **Project Settings > API > Exposed schemas** and add `gas-checker`.
+5. Confirm **Storage** contains the private `gas-checker` bucket (created by the first migration).
+6. Optionally disable email confirmation, or keep `AUTH_AUTO_CONFIRM=true` for local development.
 
 The migrations create all tables, indexes, RLS policies, triggers, seed plans, admin audit tables, platform settings and the storage bucket. If the schema is missing, the dashboard shows a setup screen instead of failing silently.
 
@@ -76,10 +79,12 @@ Open http://localhost:3000. Create an account to start a 30-day Professional tri
 
 - `/dashboard` overview
 - `/dashboard/schedule`, `/dashboard/reminders`
+- `/dashboard/jobs`, `/dashboard/properties`
 - `/dashboard/contacts`
 - `/dashboard/invoices`, `/dashboard/quotes`
 - `/dashboard/reports`
-- `/dashboard/gas-rate`
+- `/dashboard/gas-rate`, `/dashboard/tools`
+- `/dashboard/notifications`
 - `/dashboard/backup`
 - `/dashboard/settings`
 - `/dashboard/billing`
@@ -148,7 +153,10 @@ Core endpoints:
 - `GET|POST /invoices`, `GET|PATCH|DELETE /invoices/:id`, `GET|POST /invoices/:id/payments`
 - `GET|POST /quotes`, `GET|PATCH|DELETE /quotes/:id`, `POST /quotes/:id/convert`
 - `GET|POST /appointments`, `PATCH|DELETE /appointments/:id`
+- `GET|POST /properties`, `GET|PATCH|DELETE /properties/:id`
+- `GET|POST /jobs`, `GET|PATCH|DELETE /jobs/:id`
 - `GET|POST /reminders`, `PATCH|DELETE /reminders/:id`
+- `GET|POST /notifications`, `PATCH|DELETE /notifications/:id`
 - `GET /report-types`, `GET|POST /reports`, `GET|PATCH|DELETE /reports/:id`
 - `GET|POST /gas-rate`, `GET /dashboard/summary`
 - `GET|PATCH /settings`, `PATCH /profile`

@@ -1,7 +1,13 @@
 export type ReportTypeDefinition = {
   id: string;
   name: string;
-  category: "Domestic Certificate" | "Commercial Certificate" | "Continuation Pages" | "General";
+  category:
+    | "Domestic Certificate"
+    | "Commercial Certificate"
+    | "Heat Pump"
+    | "Oil"
+    | "Continuation Pages"
+    | "General";
   description?: string;
 };
 
@@ -50,6 +56,36 @@ export const REPORT_TYPES: ReportTypeDefinition[] = [
   },
   { id: "gas-testing-purging", name: "Gas Testing and Purging", category: "Commercial Certificate" },
   {
+    id: "heat-pump-service-record",
+    name: "Heat Pump Service Record",
+    category: "Heat Pump",
+  },
+  {
+    id: "heat-pump-commissioning",
+    name: "Heat Pump Commissioning Record",
+    category: "Heat Pump",
+  },
+  {
+    id: "heat-pump-handover",
+    name: "Heat Pump Handover Checklist",
+    category: "Heat Pump",
+  },
+  {
+    id: "domestic-oil-service-record",
+    name: "Domestic Oil Service Record",
+    category: "Oil",
+  },
+  {
+    id: "domestic-oil-tank-inspection",
+    name: "Domestic Oil Tank Inspection",
+    category: "Oil",
+  },
+  {
+    id: "commercial-oil-service-record",
+    name: "Commercial Oil Service Record",
+    category: "Oil",
+  },
+  {
     id: "continuation-comments",
     name: "Continuation for General Comments",
     category: "Continuation Pages",
@@ -62,6 +98,7 @@ export const REPORT_TYPES: ReportTypeDefinition[] = [
   { id: "job-sheet", name: "Job Sheet", category: "General" },
   { id: "commissioning", name: "Commissioning", category: "General" },
   { id: "cdi-oil", name: "CDII Oil", category: "General" },
+  { id: "miscellaneous-record", name: "Miscellaneous Record", category: "General" },
 ];
 
 export function reportTypeName(id: string) {

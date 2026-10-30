@@ -47,6 +47,48 @@ export const contactSchema = z.object({
 
 export const contactUpdateSchema = contactSchema.partial();
 
+export const propertySchema = z.object({
+  name: z.string().trim().min(1),
+  contact_id: z.string().uuid().optional().nullable(),
+  address_line1: optionalText,
+  address_line2: optionalText,
+  address_line3: optionalText,
+  postcode: optionalText,
+  access_notes: optionalText,
+  notes: optionalText,
+});
+
+export const propertyUpdateSchema = propertySchema.partial();
+
+export const jobSchema = z.object({
+  title: z.string().trim().min(1),
+  reference: optionalText,
+  job_type: z.string().trim().min(1).default("gas_safety"),
+  status: z.enum(["scheduled", "in_progress", "completed", "cancelled"]).default("scheduled"),
+  priority: z.enum(["low", "normal", "urgent"]).default("normal"),
+  scheduled_at: optionalDate,
+  completed_at: optionalDate,
+  contact_id: z.string().uuid().optional().nullable(),
+  property_id: z.string().uuid().optional().nullable(),
+  engineer: optionalText,
+  description: optionalText,
+  notes: optionalText,
+});
+
+export const jobUpdateSchema = jobSchema.partial();
+
+export const notificationCreateSchema = z.object({
+  title: z.string().trim().min(1).max(200),
+  body: optionalText,
+  kind: z.string().trim().min(1).max(48).default("system"),
+  link: optionalText,
+});
+
+export const notificationUpdateSchema = z.object({
+  read: z.coerce.boolean().optional(),
+  all: z.coerce.boolean().optional(),
+});
+
 export const documentItemSchema = z.object({
   description: z.string().trim().min(1),
   quantity: z.coerce.number().finite().min(0).default(1),
@@ -154,6 +196,8 @@ export const settingsSchema = z.object({
   phone: optionalText,
   email: optionalText,
   gas_engineer_id: optionalText,
+  oil_registration: optionalText,
+  mcs_registration: optionalText,
   engineer_position: optionalText,
   engineer_signature_url: optionalText,
   email_message: optionalText,
